@@ -3,6 +3,7 @@
 from agent_memory_eval.metrics import (
     EvaluationResult,
     evaluate,
+    graded_ndcg_at_k,
     ndcg_at_k,
     precision_at_k,
     recall_at_k,
@@ -12,6 +13,7 @@ from agent_memory_eval.metrics import (
 __all__ = [
     "EvaluationResult",
     "evaluate",
+    "graded_ndcg_at_k",
     "ndcg_at_k",
     "precision_at_k",
     "recall_at_k",
