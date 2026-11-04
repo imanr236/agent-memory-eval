@@ -2,7 +2,7 @@
 
 A lightweight Python toolkit for evaluating ranked retrieval from AI agent memory systems.
 
-> **Status:** early development (v0.1.0). The first release focuses on transparent, deterministic retrieval metrics and a simple JSONL workflow.
+> **Status:** early development (v0.1.0). The project provides deterministic retrieval metrics and a simple JSONL workflow.
 
 ## Why this project?
 
@@ -13,12 +13,13 @@ Agent memory systems can store useful information and still retrieve the wrong m
 - Recall@k
 - Precision@k
 - Reciprocal rank
-- Normalized Discounted Cumulative Gain (NDCG@k)
+- Binary Normalized Discounted Cumulative Gain (NDCG@k)
+- Graded NDCG@k with linear or exponential gain
 - JSONL dataset validation
 - Command-line evaluation with aggregate and per-query JSON output
 - Unit tests and GitHub Actions CI
 
-The initial release uses binary relevance: each memory identifier is either relevant or not relevant for a query.
+The JSONL CLI workflow currently uses binary relevance: each memory identifier is either relevant or not relevant for a query. Graded relevance is available through the Python API.
 
 ## Installation
 
@@ -56,6 +57,8 @@ agent-memory-eval examples/sample.jsonl -k 3 --output report.json
 
 ## Python API
 
+### Binary relevance
+
 ```python
 from agent_memory_eval import evaluate, recall_at_k
 
@@ -68,6 +71,26 @@ result = evaluate("q1", relevant, retrieved, k=3)
 print(result.to_dict())
 ```
 
+### Graded relevance
+
+Use a score to express how useful each memory is for a query. Higher scores mean stronger relevance.
+
+```python
+from agent_memory_eval import graded_ndcg_at_k
+
+relevance = {
+    "memory-a": 3,  # highly relevant
+    "memory-b": 2,  # partially relevant
+    "memory-c": 1,  # weakly relevant
+}
+retrieved = ["memory-b", "memory-a", "memory-c"]
+
+score = graded_ndcg_at_k(relevance, retrieved, k=3)
+print(score)
+```
+
+The default `gain="exponential"` uses `2**relevance - 1`, giving stronger preference to highly relevant memories. Use `gain="linear"` to use raw relevance scores instead. Scores must be finite and non-negative. Exponential scores are limited to 1023 to avoid numeric overflow.
+
 ## Metric definitions
 
 | Metric | Meaning |
@@ -75,9 +98,10 @@ print(result.to_dict())
 | Recall@k | Relevant memories found in the first k results divided by all relevant memories |
 | Precision@k | Relevant results in the first k slots divided by k |
 | Reciprocal rank | 1 / rank of the first relevant result, or 0 if none is found |
-| NDCG@k | Discounted gain of the ranking normalized by the ideal ranking |
+| NDCG@k | Discounted binary gain normalized by the ideal ranking |
+| Graded NDCG@k | Discounted relevance gain normalized by the ideal graded ranking |
 
-Duplicate retrieved IDs are ignored after their first occurrence. For Precision@k, unfilled slots count as non-relevant. Empty ground-truth relevance sets return 0 for all metrics; datasets should ideally avoid such rows unless they are intentional no-answer cases.
+Duplicate retrieved IDs are ignored after their first occurrence. For Precision@k, unfilled slots count as non-relevant. Empty ground-truth relevance sets return 0 for binary metrics; an all-zero graded relevance map returns 0 for graded NDCG.
 
 ## Development
 
@@ -89,7 +113,7 @@ ruff check .
 
 ## Roadmap
 
-- [ ] Add graded relevance and configurable gain functions
+- [x] Add graded relevance and configurable gain functions
 - [ ] Add dataset-level confidence intervals and bootstrap comparisons
 - [ ] Add memory update and temporal consistency evaluation tasks
 - [ ] Add adapters for common agent memory stores
@@ -101,4 +125,4 @@ Issues and pull requests are welcome. Please include tests for behavior changes 
 
 ## License
 
-No license has been selected yet. Until a license is added, default copyright rules apply and reuse permissions should not be assumed.
+This project is licensed under the [MIT License](LICENSE).
