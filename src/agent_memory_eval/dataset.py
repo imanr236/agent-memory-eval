@@ -18,14 +18,19 @@ class RetrievalExample:
 
 
 def _string_list(value: Any, field: str, line_number: int) -> list[str]:
-    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
-        raise ValueError(f"line {line_number}: '{field}' must be a list of strings")
+    if not isinstance(value, list) or any(
+        not isinstance(item, str) or not item.strip() for item in value
+    ):
+        raise ValueError(
+            f"line {line_number}: '{field}' must be a list of non-empty strings"
+        )
     return value
 
 
 def load_jsonl(path: str | Path) -> list[RetrievalExample]:
     """Load query examples from a JSON Lines file."""
     examples: list[RetrievalExample] = []
+    seen_query_ids: set[str] = set()
     source = Path(path)
     with source.open(encoding="utf-8") as handle:
         for line_number, raw_line in enumerate(handle, start=1):
@@ -40,8 +45,15 @@ def load_jsonl(path: str | Path) -> list[RetrievalExample]:
             query_id = record.get("query_id")
             if not isinstance(query_id, str) or not query_id.strip():
                 raise ValueError(f"line {line_number}: 'query_id' must be a non-empty string")
+            if query_id in seen_query_ids:
+                raise ValueError(f"line {line_number}: duplicate query_id '{query_id}'")
             relevant = _string_list(record.get("relevant_ids"), "relevant_ids", line_number)
             retrieved = _string_list(record.get("retrieved_ids"), "retrieved_ids", line_number)
+            if len(relevant) != len(set(relevant)):
+                raise ValueError(
+                    f"line {line_number}: 'relevant_ids' must not contain duplicates"
+                )
+            seen_query_ids.add(query_id)
             examples.append(RetrievalExample(query_id, relevant, retrieved))
     if not examples:
         raise ValueError(f"dataset is empty: {source}")
