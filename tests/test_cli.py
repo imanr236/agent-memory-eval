@@ -9,7 +9,7 @@ def test_cli_prints_aggregate_report(tmp_path, monkeypatch, capsys):
         '{"query_id":"q1","relevant_ids":["m1"],"retrieved_ids":["m1","m2"]}\n',
         encoding="utf-8",
     )
-    monkeypatch.setattr("sys.argv", ["agent-memory-eval", str(dataset), "--k", "2"])
+    monkeypatch.setattr("sys.argv", ["agent-memory-eval", str(dataset), "-k", "2"])
     assert main() == 0
     report = json.loads(capsys.readouterr().out)
     assert report["num_queries"] == 1
