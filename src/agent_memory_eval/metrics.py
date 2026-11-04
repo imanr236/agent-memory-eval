@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import asdict, dataclass
 from math import log2
-from typing import Iterable, Sequence
 
 
 def _validate_k(k: int) -> None:
