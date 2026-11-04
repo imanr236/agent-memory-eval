@@ -23,7 +23,7 @@ def recall_at_k(relevant: Iterable[str], retrieved: Sequence[str], k: int) -> fl
     relevant_set = set(relevant)
     if not relevant_set:
         return 0.0
-    return len(relevant_set.intersection(_unique(retrieved[:k]))) / len(relevant_set)
+    return len(relevant_set.intersection(_unique(retrieved)[:k])) / len(relevant_set)
 
 
 def precision_at_k(relevant: Iterable[str], retrieved: Sequence[str], k: int) -> float:
