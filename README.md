@@ -45,13 +45,13 @@ Example:
 Run the included example:
 
 ```bash
-agent-memory-eval examples/sample.jsonl --k 5
+agent-memory-eval examples/sample.jsonl -k 5
 ```
 
 Or write the report to a file:
 
 ```bash
-agent-memory-eval examples/sample.jsonl --k 3 --output report.json
+agent-memory-eval examples/sample.jsonl -k 3 --output report.json
 ```
 
 ## Python API
