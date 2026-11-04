@@ -40,6 +40,7 @@ def test_empty_relevant_set_returns_zero():
 
 def test_duplicate_retrievals_are_not_double_counted():
     assert recall_at_k(["a", "b"], ["a", "a", "b"], 3) == 1.0
+    assert recall_at_k(["b"], ["a", "a", "b"], 2) == 1.0
     assert reciprocal_rank(["a"], ["x", "a", "a"]) == 0.5
 
 
