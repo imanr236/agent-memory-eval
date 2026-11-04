@@ -8,7 +8,6 @@ version = "0.1.0"
 description = "A lightweight toolkit for evaluating retrieval quality in AI agent memory systems."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "License not yet selected" }
 dependencies = []
 
 [project.optional-dependencies]
